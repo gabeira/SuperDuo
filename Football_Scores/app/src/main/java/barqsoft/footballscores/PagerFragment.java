@@ -80,7 +80,8 @@ public class PagerFragment extends Fragment {
                 time.setToNow();
                 // Otherwise, the format is just the day of the week (e.g "Wednesday".
                 SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE");
-                return dayFormat.format(dateInMillis);
+                String dayName = dayFormat.format(dateInMillis);
+                return dayName.substring(0, 1).toUpperCase() + dayName.substring(1);
             }
         }
     }
