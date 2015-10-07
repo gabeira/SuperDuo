@@ -20,7 +20,7 @@ import java.util.Date;
 import barqsoft.footballscores.DatabaseContract;
 import barqsoft.footballscores.MainActivity;
 import barqsoft.footballscores.R;
-import barqsoft.footballscores.Utilies;
+import barqsoft.footballscores.Utility;
 
 public class NextMatchWidgetIntentService extends IntentService {
 
@@ -96,8 +96,8 @@ public class NextMatchWidgetIntentService extends IntentService {
                 setRemoteContentDescription(views, getString(R.string.tomorrow) + " " + time + " - " + home + " vs " + away);
             }
             views.setTextViewText(R.id.widget_match, getString(R.string.tomorrow) + " " + time);
-            views.setImageViewResource(R.id.widget_home_crest, Utilies.getTeamCrestByTeamName(home));
-            views.setImageViewResource(R.id.widget_away_crest, Utilies.getTeamCrestByTeamName(away));
+            views.setImageViewResource(R.id.widget_home_crest, Utility.getTeamCrestByTeamName(home));
+            views.setImageViewResource(R.id.widget_away_crest, Utility.getTeamCrestByTeamName(away));
             views.setTextViewText(R.id.widget_home_name, home);
             views.setTextViewText(R.id.widget_away_name, away);
 

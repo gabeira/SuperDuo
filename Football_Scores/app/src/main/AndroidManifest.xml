@@ -34,7 +34,8 @@
                 android:value="barqsoft.footballscores.MainActivity" />
         </activity>
 
-        <receiver android:name=".widget.NextMatchWidgetProvider"
+        <receiver
+            android:name=".widget.NextMatchWidgetProvider"
             android:label="@string/widget_next_match">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -45,7 +46,8 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_next_match" />
         </receiver>
-        <receiver android:name=".widget.ScoresWidgetProvider"
+        <receiver
+            android:name=".widget.ScoresWidgetProvider"
             android:label="@string/widget_scores">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -57,7 +59,7 @@
                 android:resource="@xml/widget_scores" />
         </receiver>
 
-        <service android:name=".service.myFetchService" />
+        <service android:name=".service.MyFetchService" />
 
         <service android:name=".widget.NextMatchWidgetIntentService" />
         <service android:name=".widget.ScoresWidgetRemoteViewsService" />
