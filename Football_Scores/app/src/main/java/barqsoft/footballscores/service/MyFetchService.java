@@ -49,7 +49,7 @@ public class MyFetchService extends IntentService {
 
         Uri fetch_build = Uri.parse(BASE_URL).buildUpon().
                 appendQueryParameter(QUERY_TIME_FRAME, timeFrame).build();
-        Log.v(LOG_TAG, "The url we are looking at is: "+fetch_build.toString()); //log spam
+//        Log.v(LOG_TAG, "The url we are looking at is: " + fetch_build.toString()); //log spam
         HttpURLConnection m_connection = null;
         BufferedReader reader = null;
         String JSON_data = null;
@@ -122,7 +122,6 @@ public class MyFetchService extends IntentService {
         //JSON data
         // This set of league codes is for the 2015/2016 season. In fall of 2016, they will need to
         // be updated. Feel free to use the codes
-        final String CHAMPIONS_LEAGUE = "362";
         final String BUNDESLIGA1 = "394";
         final String BUNDESLIGA2 = "395";
         final String LIGUE1 = "396";
@@ -134,6 +133,7 @@ public class MyFetchService extends IntentService {
         final String PRIMERA_LIGA = "402";
         final String BUNDESLIGA3 = "403";
         final String EREDIVISIE = "404";
+        final String CHAMPIONS_LEAGUE = "405";
 
         final String SEASON_LINK = "http://api.football-data.org/alpha/soccerseasons/";
         final String MATCH_LINK = "http://api.football-data.org/alpha/fixtures/";
@@ -150,15 +150,17 @@ public class MyFetchService extends IntentService {
         final String MATCH_DAY = "matchday";
 
         //Match data
-        String League = null;
+        String league = null;
         String mDate = null;
         String mTime = null;
-        String Home = null;
-        String Away = null;
-        String Home_goals = null;
-        String Away_goals = null;
+        String home = null;
+        String away = null;
+        String home_goals = null;
+        String away_goals = null;
         String match_id = null;
         String match_day = null;
+        String home_crest_url = null;
+        String away_crest_url = null;
 
         try {
             JSONArray matches = new JSONObject(JSONdata).getJSONArray(FIXTURES);
@@ -168,24 +170,24 @@ public class MyFetchService extends IntentService {
             for (int i = 0; i < matches.length(); i++) {
 
                 JSONObject match_data = matches.getJSONObject(i);
-                League = match_data.getJSONObject(LINKS).getJSONObject(SOCCER_SEASON).getString("href");
-                League = League.replace(SEASON_LINK, "");
+                league = match_data.getJSONObject(LINKS).getJSONObject(SOCCER_SEASON).getString("href");
+                league = league.replace(SEASON_LINK, "");
                 //This if statement controls which leagues we're interested in the data from.
                 //add leagues here in order to have them be added to the DB.
                 // If you are finding no data in the app, check that this contains all the leagues.
                 // If it doesn't, that can cause an empty DB, bypassing the dummy data routine.
-                if (League.equals(PREMIER_LEAGUE) ||
-                        League.equals(SERIE_A) ||
-                        League.equals(PRIMERA_DIVISION) ||
-                        League.equals(SEGUNDA_DIVISION) ||
-                        League.equals(CHAMPIONS_LEAGUE) ||
-                        League.equals(LIGUE1) ||
-                        League.equals(LIGUE2) ||
-                        League.equals(BUNDESLIGA1) ||
-                        League.equals(BUNDESLIGA2) ||
-                        League.equals(BUNDESLIGA3) ||
-                        League.equals(PRIMERA_LIGA) ||
-                        League.equals(EREDIVISIE)) {
+                if (league.equals(PREMIER_LEAGUE) ||
+                        league.equals(SERIE_A) ||
+                        league.equals(PRIMERA_DIVISION) ||
+                        league.equals(SEGUNDA_DIVISION) ||
+                        league.equals(CHAMPIONS_LEAGUE) ||
+                        league.equals(LIGUE1) ||
+                        league.equals(LIGUE2) ||
+                        league.equals(BUNDESLIGA1) ||
+                        league.equals(BUNDESLIGA2) ||
+                        league.equals(BUNDESLIGA3) ||
+                        league.equals(PRIMERA_LIGA) ||
+                        league.equals(EREDIVISIE)) {
                     match_id = match_data.getJSONObject(LINKS).getJSONObject(SELF).getString("href");
                     match_id = match_id.replace(MATCH_LINK, "");
                     if (!isReal) {
@@ -216,30 +218,39 @@ public class MyFetchService extends IntentService {
                         Log.d(LOG_TAG, "error here!");
                         Log.e(LOG_TAG, e.getMessage());
                     }
-                    Home = match_data.getString(HOME_TEAM);
-                    Away = match_data.getString(AWAY_TEAM);
-                    Home_goals = match_data.getJSONObject(RESULT).getString(HOME_GOALS);
-                    Away_goals = match_data.getJSONObject(RESULT).getString(AWAY_GOALS);
+                    try {
+                        home_crest_url = getCrestData(match_data.getJSONObject("_links").getJSONObject("homeTeam").getString("href"));
+                        away_crest_url = getCrestData(match_data.getJSONObject("_links").getJSONObject("awayTeam").getString("href"));
+                    } catch (Exception e) {
+                        Log.e(LOG_TAG, "Error to get Crest Image Url " + e.getMessage());
+                    }
+                    home = match_data.getString(HOME_TEAM);
+                    away = match_data.getString(AWAY_TEAM);
+                    home_goals = match_data.getJSONObject(RESULT).getString(HOME_GOALS);
+                    away_goals = match_data.getJSONObject(RESULT).getString(AWAY_GOALS);
                     match_day = match_data.getString(MATCH_DAY);
                     ContentValues match_values = new ContentValues();
                     match_values.put(DatabaseContract.scores_table.MATCH_ID, match_id);
                     match_values.put(DatabaseContract.scores_table.DATE_COL, mDate);
                     match_values.put(DatabaseContract.scores_table.TIME_COL, mTime);
-                    match_values.put(DatabaseContract.scores_table.HOME_COL, Home);
-                    match_values.put(DatabaseContract.scores_table.AWAY_COL, Away);
-                    match_values.put(DatabaseContract.scores_table.HOME_GOALS_COL, Home_goals);
-                    match_values.put(DatabaseContract.scores_table.AWAY_GOALS_COL, Away_goals);
-                    match_values.put(DatabaseContract.scores_table.LEAGUE_COL, League);
+                    match_values.put(DatabaseContract.scores_table.HOME_COL, home);
+                    match_values.put(DatabaseContract.scores_table.AWAY_COL, away);
+                    match_values.put(DatabaseContract.scores_table.HOME_GOALS_COL, home_goals);
+                    match_values.put(DatabaseContract.scores_table.AWAY_GOALS_COL, away_goals);
+                    match_values.put(DatabaseContract.scores_table.LEAGUE_COL, league);
                     match_values.put(DatabaseContract.scores_table.MATCH_DAY, match_day);
+                    match_values.put(DatabaseContract.scores_table.HOME_CREST_URL_COL, home_crest_url);
+                    match_values.put(DatabaseContract.scores_table.AWAY_CREST_URL_COL, away_crest_url);
                     //log spam
 
-                    //Log.v(LOG_TAG,match_id);
-                    //Log.v(LOG_TAG,mDate);
-                    //Log.v(LOG_TAG,mTime);
-                    //Log.v(LOG_TAG,Home);
-                    //Log.v(LOG_TAG,Away);
-                    //Log.v(LOG_TAG,Home_goals);
-                    //Log.v(LOG_TAG,Away_goals);
+//                    Log.v(LOG_TAG,home_crest_url);
+//                    Log.v(LOG_TAG,match_id);
+//                    Log.v(LOG_TAG,mDate);
+//                    Log.v(LOG_TAG,mTime);
+//                    Log.v(LOG_TAG,home);
+//                    Log.v(LOG_TAG,away);
+//                    Log.v(LOG_TAG,home_goals);
+//                    Log.v(LOG_TAG,away_goals);
 
                     values.add(match_values);
                 }
@@ -249,9 +260,76 @@ public class MyFetchService extends IntentService {
             values.toArray(insert_data);
             inserted_data = mContext.getContentResolver().bulkInsert(DatabaseContract.BASE_CONTENT_URI, insert_data);
 
-            //Log.v(LOG_TAG,"Succesfully Inserted : " + String.valueOf(inserted_data));
+            Log.v(LOG_TAG,"Succesfully Inserted : " + String.valueOf(inserted_data));
         } catch (JSONException e) {
+            Log.e(LOG_TAG, "Error " + e.getMessage());
+        }
+    }
+
+    private String getCrestData(String teamUrl) {
+        Uri fetch_build_crest = Uri.parse(teamUrl).buildUpon().build();
+//        Log.v(LOG_TAG, "The crest url we are looking at is: "+fetch_build_crest.toString()); //log spam
+        HttpURLConnection m_connection_crest = null;
+        BufferedReader reader = null;
+        String JSON_data = null;
+        //Opening Connection
+        try {
+            URL fetch_crest = new URL(fetch_build_crest.toString());
+            m_connection_crest = (HttpURLConnection) fetch_crest.openConnection();
+            m_connection_crest.setRequestMethod("GET");
+            m_connection_crest.addRequestProperty("X-Auth-Token", getString(R.string.api_key));
+            m_connection_crest.connect();
+
+            // Read the input stream into a String
+            InputStream inputStream_crest = m_connection_crest.getInputStream();
+            StringBuffer buffer_crest = new StringBuffer();
+            if (inputStream_crest == null) {
+                // Nothing to do.
+                return null;
+            }
+            reader = new BufferedReader(new InputStreamReader(inputStream_crest));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                // But it does make debugging a *lot* easier if you print out the completed
+                // buffer for debugging.
+                buffer_crest.append(line + "\n");
+            }
+            if (buffer_crest.length() == 0) {
+                // Stream was empty.  No point in parsing.
+                Log.e(LOG_TAG, "Error Server Down");
+                return null;
+            }
+            JSON_data = buffer_crest.toString();
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Exception here " + e.getLocalizedMessage());
+            e.printStackTrace();
+        } finally {
+//            if (m_connection_crest != null) {
+//                m_connection_crest.disconnect();
+//            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error Closing Stream");
+                }
+            }
+        }
+        try {
+            if (JSON_data != null) {
+                //This bit is to check if the data contains any matches. If not, we call processJson on the dummy data
+                return new JSONObject(JSON_data).getString("crestUrl");
+            } else {
+                //Could not Connect
+                Log.d(LOG_TAG, "Could not connect to server.");
+                return null;
+            }
+        } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
 }

@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import barqsoft.footballscores.service.MyFetchService;
+
 public class MainActivity extends ActionBarActivity
 {
     public static int selected_match_id;
@@ -24,9 +26,15 @@ public class MainActivity extends ActionBarActivity
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, my_main)
                     .commit();
+
+            update_scores();
         }
     }
 
+    private void update_scores() {
+        Intent service_start = new Intent(this, MyFetchService.class);
+        startService(service_start);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

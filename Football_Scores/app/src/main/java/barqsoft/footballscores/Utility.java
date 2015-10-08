@@ -1,12 +1,28 @@
 package barqsoft.footballscores;
 
 import android.content.Context;
+import android.graphics.drawable.PictureDrawable;
+import android.net.Uri;
+import android.widget.ImageView;
+
+import com.bumptech.glide.GenericRequestBuilder;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.model.StreamEncoder;
+import com.bumptech.glide.load.resource.file.FileToStreamDecoder;
+import com.caverock.androidsvg.SVG;
+
+import java.io.InputStream;
+
+import barqsoft.footballscores.svg.SvgDecoder;
+import barqsoft.footballscores.svg.SvgDrawableTranscoder;
+import barqsoft.footballscores.svg.SvgSoftwareLayerSetter;
 
 /**
  * Created by yehya khaled on 3/3/2015.
  */
 public class Utility {
-    public static final int CHAMPIONS_LEAGUE = 362;
+
     public static final int BUNDESLIGA1 = 394;
     public static final int BUNDESLIGA2 = 395;
     public static final int LIGUE1 = 396;
@@ -18,6 +34,7 @@ public class Utility {
     public static final int PRIMERA_LIGA = 402;
     public static final int BUNDESLIGA3 = 403;
     public static final int EREDIVISIE = 404;
+    public static final int CHAMPIONS_LEAGUE = 405;
 
     public static String getLeague(Context context, int league_num) {
         switch (league_num) {
@@ -104,6 +121,48 @@ public class Utility {
                 return R.drawable.stoke_city;
             default:
                 return R.drawable.no_icon;
+        }
+    }
+
+    private static GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder;
+    /**
+     * Load Team Crest with Glide and SVG
+     *
+     * @param imageView The reference to Image View to load into.
+     * @param crestUrl The URL which the Image come from.
+     * @param context A Context object which should be some mock instance.
+     */
+    public static void setTeamCrestIntoImageView(ImageView imageView, String crestUrl, Context context){
+        if (crestUrl == null){
+            imageView.setImageResource(R.drawable.no_icon);
+        } else
+        if(crestUrl.toLowerCase().endsWith("svg")){
+            requestBuilder =
+                    Glide.with(context)
+                            .using(Glide.buildStreamModelLoader(Uri.class, context), InputStream.class)
+                            .from(Uri.class)
+                            .as(SVG.class)
+                            .transcode(new SvgDrawableTranscoder(), PictureDrawable.class)
+                            .sourceEncoder(new StreamEncoder())
+                            .cacheDecoder(new FileToStreamDecoder<SVG>(new SvgDecoder()))
+                            .decoder(new SvgDecoder())
+                            .error(R.drawable.no_icon)
+                            .animate(android.R.anim.fade_in)
+                            .listener(new SvgSoftwareLayerSetter<Uri>());
+
+            Uri uri = Uri.parse(crestUrl);
+            requestBuilder.diskCacheStrategy(DiskCacheStrategy.SOURCE)// SVG cannot be serialized so it's not worth to cache it
+                    .load(uri)
+                    .error(R.drawable.no_icon)
+                    .animate(android.R.anim.fade_in)
+                    .into(imageView);
+        }else{
+            Glide.with(context)
+                    .load(crestUrl)
+                    .fitCenter()
+                    .error(R.drawable.no_icon)
+                    .animate(android.R.anim.fade_in)
+                    .into(imageView);
         }
     }
 }
