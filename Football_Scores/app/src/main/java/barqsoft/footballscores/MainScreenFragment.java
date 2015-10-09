@@ -40,7 +40,12 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
         if (savedInstanceState != null) {
             setFragmentDate(savedInstanceState.getString("fragmentdate"));
             last_selected_item = savedInstanceState.getInt("last_selected_item");
-            score_list.setSelection(last_selected_item);
+            score_list.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    score_list.setSelection(last_selected_item);
+                }
+            },100L);
         }
 //        Log.d("MainScreenFragment", "onCreateView for day " + fragmentdate[0]); //log spam
         TextView emptyView = (TextView) rootView.findViewById(R.id.empty_view);
