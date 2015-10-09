@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,12 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
         final ListView score_list = (ListView) rootView.findViewById(R.id.scores_list);
         mAdapter = new ScoresAdapter(getActivity(), null, 0);
         score_list.setAdapter(mAdapter);
+        if (savedInstanceState != null) {
+            setFragmentDate(savedInstanceState.getString("fragmentdate"));
+            last_selected_item = savedInstanceState.getInt("last_selected_item");
+            score_list.setSelection(last_selected_item);
+        }
+//        Log.d("MainScreenFragment", "onCreateView for day " + fragmentdate[0]); //log spam
         getLoaderManager().initLoader(SCORES_LOADER, null, this);
         mAdapter.detail_match_id = MainActivity.selected_match_id;
         score_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -44,10 +51,19 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
                 mAdapter.detail_match_id = selected.match_id;
                 MainActivity.selected_match_id = (int) selected.match_id;
                 mAdapter.notifyDataSetChanged();
+                last_selected_item = position;
             }
         });
         return rootView;
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString("fragmentdate", fragmentdate[0]);
+        outState.putInt("last_selected_item", last_selected_item);
+        super.onSaveInstanceState(outState);
+    }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
@@ -58,14 +74,7 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         //Log.v(FetchScoreTask.LOG_TAG,"loader finished");
-        //cursor.moveToFirst();
-        /*
-        while (!cursor.isAfterLast())
-        {
-            Log.v(FetchScoreTask.LOG_TAG,cursor.getString(1));
-            cursor.moveToNext();
-        }
-        */
+        if (null == cursor) return;
 
         int i = 0;
         cursor.moveToFirst();
