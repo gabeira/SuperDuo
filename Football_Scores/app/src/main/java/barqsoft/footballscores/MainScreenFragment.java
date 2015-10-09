@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -42,6 +43,10 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
             score_list.setSelection(last_selected_item);
         }
 //        Log.d("MainScreenFragment", "onCreateView for day " + fragmentdate[0]); //log spam
+        TextView emptyView = (TextView) rootView.findViewById(R.id.empty_view);
+        emptyView.setText(getString(R.string.no_match)+ " " + fragmentdate[0]);
+        score_list.setEmptyView(emptyView);
+
         getLoaderManager().initLoader(SCORES_LOADER, null, this);
         mAdapter.detail_match_id = MainActivity.selected_match_id;
         score_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
