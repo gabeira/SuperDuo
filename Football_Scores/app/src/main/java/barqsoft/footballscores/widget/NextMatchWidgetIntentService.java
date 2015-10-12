@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.widget.RemoteViews;
 
@@ -20,7 +21,6 @@ import java.util.Date;
 import barqsoft.footballscores.DatabaseContract;
 import barqsoft.footballscores.MainActivity;
 import barqsoft.footballscores.R;
-import barqsoft.footballscores.Utility;
 
 public class NextMatchWidgetIntentService extends IntentService {
 
@@ -58,32 +58,33 @@ public class NextMatchWidgetIntentService extends IntentService {
         selectionArgs[0] = mformat.format(fragmentdate);
 
         Cursor data = getContentResolver().query(matchesWithDateUri, null, null, selectionArgs, null);
+        boolean empty = false;
+        String time = "";
+        String home = "";
+        String away = "";
 
         if (data == null) {
-            return;
-        }
-        if (!data.moveToFirst()) {
+            empty = true;
+        } else if (!data.moveToFirst()) {
             data.close();
-            return;
+            empty = true;
+        } else {
+
+            // Extract the Match data from the Cursor
+            time = data.getString(INDEX_MATCH_TIME);
+            home = data.getString(INDEX_MATCH_HOME);
+            away = data.getString(INDEX_MATCH_AWAY);
+//            Log.d("Widget Next", "Match " + home + " vs " + away + " at " + time );
+
+            data.close();
         }
-
-        // Extract the Match data from the Cursor
-        String time = data.getString(INDEX_MATCH_TIME);
-        String home = data.getString(INDEX_MATCH_HOME);
-        String away = data.getString(INDEX_MATCH_AWAY);
-//        Log.e("Widget", "cursor time:" + time);
-//        Log.e("Widget", "cursor home:" + home);
-//        Log.e("Widget", "cursor away :" + away);
-
-        data.close();
-
         // Perform this loop procedure for each Next Match widget
         for (int appWidgetId : appWidgetIds) {
             // Find the correct layout based on the widget's width
             int widgetWidth = getWidgetWidth(appWidgetManager, appWidgetId);
             int defaultWidth = getResources().getDimensionPixelSize(R.dimen.widget_next_default_width);
             int layoutId;
-            if (widgetWidth > defaultWidth) {
+            if (widgetWidth >= defaultWidth) {
                 layoutId = R.layout.widget_next;
             } else {
                 layoutId = R.layout.widget_next_small;
@@ -93,14 +94,28 @@ public class NextMatchWidgetIntentService extends IntentService {
             // Add the data to the RemoteViews
             // Content Descriptions for RemoteViews were only added in ICS MR1
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                setRemoteContentDescription(views, getString(R.string.tomorrow) + " " + time + " - " + home + " vs " + away);
+                if (empty)
+                    setRemoteContentDescription(views, getString(R.string.no_match) + " " + getString(R.string.tomorrow));
+                else
+                    setRemoteContentDescription(views, getString(R.string.tomorrow) + " " + time + " - " + home + " vs " + away);
             }
-            views.setTextViewText(R.id.widget_match, getString(R.string.tomorrow) + " " + time);
-            views.setImageViewResource(R.id.widget_home_crest, Utility.getTeamCrestByTeamName(home));
-            views.setImageViewResource(R.id.widget_away_crest, Utility.getTeamCrestByTeamName(away));
-            views.setTextViewText(R.id.widget_home_name, home);
-            views.setTextViewText(R.id.widget_away_name, away);
-
+            if (widgetWidth >= defaultWidth) {
+                if (empty) {
+                    views.setTextViewText(R.id.widget_match, getString(R.string.tomorrow));
+                    views.setTextViewText(R.id.widget_home_name, getString(R.string.no_match));
+                } else {
+                    views.setTextViewText(R.id.widget_match, getString(R.string.tomorrow) + " " + time);
+                    views.setTextViewText(R.id.widget_home_name, home);
+                    views.setTextViewText(R.id.widget_away_name, away);
+                }
+            } else {
+                views.setTextViewText(R.id.widget_tomorrow, getString(R.string.tomorrow));
+                if (empty)
+                    views.setTextViewText(R.id.widget_empty, getString(R.string.no_match));
+                else {
+                    views.setTextViewText(R.id.widget_match, time);
+                }
+            }
             // Create an Intent to launch MainActivity
             Intent launchIntent = new Intent(this, MainActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, launchIntent, 0);

@@ -24,6 +24,7 @@ import java.util.Vector;
 
 import barqsoft.footballscores.DatabaseContract;
 import barqsoft.footballscores.R;
+import barqsoft.footballscores.ScoresAdapter;
 
 /**
  * Created by yehya khaled on 3/2/2015.
@@ -260,7 +261,11 @@ public class MyFetchService extends IntentService {
             values.toArray(insert_data);
             inserted_data = mContext.getContentResolver().bulkInsert(DatabaseContract.BASE_CONTENT_URI, insert_data);
 
-            Log.v(LOG_TAG,"Succesfully Inserted : " + String.valueOf(inserted_data));
+            if (inserted_data > 0) {
+                Intent intent = new Intent(ScoresAdapter.ACTION_DATA_UPDATED);
+                mContext.sendBroadcast(intent);
+                Log.d(LOG_TAG, "Succesfully Inserted : " + String.valueOf(inserted_data));
+            }
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Error " + e.getMessage());
         }

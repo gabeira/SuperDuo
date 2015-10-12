@@ -3,58 +3,69 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/green10"
-    android:gravity="center">
+    android:gravity="center"
+    android:padding="@dimen/widget_margin">
 
     <LinearLayout
         android:id="@+id/layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="4dp">
-
-        <TextView
-            android:id="@+id/widget_match"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:fontFamily="sans-serif"
-            android:textAppearance="?android:textAppearanceMedium"
-            tools:text="no match tomorrow" />
+        android:layout_gravity="center_vertical"
+        android:background="@color/green01"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:background="@android:color/white"
-            android:gravity="center"
+            android:layout_height="@dimen/abc_action_bar_progress_bar_size"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/widget_home_name"
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginEnd="2dp"
-                android:layout_marginRight="2dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:textColor="@color/green05"
-                tools:text="Home" />
+                android:layout_gravity="start|center_vertical"
+                android:contentDescription="@string/app_name"
+                android:paddingEnd="8dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingStart="8dp"
+                android:src="@drawable/ic_launcher" />
 
             <TextView
-                android:id="@+id/widget_away_name"
+                android:id="@+id/widget_tomorrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="2dp"
-                android:layout_marginStart="2dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:textColor="@color/green05"
-                tools:text="Away" />
+                android:layout_gravity="center"
+                android:fontFamily="sans-serif-condensed"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/orange01"
+                tools:text="@string/tomorrow" />
         </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/widget_match"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:paddingEnd="8dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="@color/orange01"
+                android:textSize="@dimen/Score" />
+
+            <TextView
+                android:id="@+id/widget_empty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/orange01"
+                tools:text="@string/no_match" />
+        </FrameLayout>
     </LinearLayout>
 </FrameLayout>

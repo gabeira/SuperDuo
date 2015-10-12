@@ -23,7 +23,9 @@
 
         <provider
             android:name=".ScoresProvider"
-            android:authorities="barqsoft.footballscores" />
+            android:authorities="barqsoft.footballscores"
+            android:exported="true"
+            android:syncable="true" />
 
         <activity
             android:name=".AboutActivity"
@@ -62,7 +64,10 @@
         <service android:name=".service.MyFetchService" />
 
         <service android:name=".widget.NextMatchWidgetIntentService" />
-        <service android:name=".widget.ScoresWidgetRemoteViewsService" />
+
+        <service
+            android:name=".widget.ScoresWidgetRemoteViewsService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

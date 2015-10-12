@@ -11,9 +11,10 @@
     <dimen name="crest_size">80dp</dimen>
 
     <!-- Widget -->
-    <dimen name="widget_next_default_width">80dp</dimen>
+    <dimen name="widget_margin">8dp</dimen>
+    <dimen name="widget_next_default_width">220dp</dimen>
     <dimen name="widget_next_default_height">40dp</dimen>
-    <dimen name="widget_next_min_resize_width">80dp</dimen>
+    <dimen name="widget_next_min_resize_width">100dp</dimen>
     <dimen name="widget_next_min_resize_height">@dimen/widget_next_default_height</dimen>
 
     <dimen name="widget_scores_default_width">250dp</dimen>
