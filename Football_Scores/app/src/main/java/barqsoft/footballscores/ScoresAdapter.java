@@ -48,14 +48,16 @@ public class ScoresAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
         final ViewHolder mHolder = (ViewHolder) view.getTag();
-        mHolder.home_name.setText(cursor.getString(COL_HOME));
-        mHolder.away_name.setText(cursor.getString(COL_AWAY));
+        final String home = cursor.getString(COL_HOME);
+        final String away = cursor.getString(COL_AWAY);
+        mHolder.home_name.setText(home);
+        mHolder.away_name.setText(away);
         mHolder.date.setText(cursor.getString(COL_MATCHTIME));
         mHolder.score.setText(Utility.getScores(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
         mHolder.match_id = cursor.getDouble(COL_ID);
 
-        Utility.setTeamCrestIntoImageView(mHolder.home_crest,cursor.getString(COL_HOME_CREST),context);
-        Utility.setTeamCrestIntoImageView(mHolder.away_crest,cursor.getString(COL_AWAY_CREST),context);
+        Utility.setTeamCrestIntoImageView(mHolder.home_crest, cursor.getString(COL_HOME_CREST), context);
+        Utility.setTeamCrestIntoImageView(mHolder.away_crest, cursor.getString(COL_AWAY_CREST), context);
 
         //Log.v(FetchScoreTask.LOG_TAG,mHolder.home_name.getText() + " Vs. " + mHolder.away_name.getText() +" id " + String.valueOf(mHolder.match_id));
         //Log.v(FetchScoreTask.LOG_TAG,String.valueOf(detail_match_id));
@@ -73,6 +75,7 @@ public class ScoresAdapter extends CursorAdapter {
             TextView league = (TextView) v.findViewById(R.id.league_textview);
             league.setText(Utility.getLeague(context, cursor.getInt(COL_LEAGUE)));
             Button share_button = (Button) v.findViewById(R.id.share_button);
+            share_button.setContentDescription(context.getString(R.string.share_text) + " " + home + " vs " + away);
             share_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

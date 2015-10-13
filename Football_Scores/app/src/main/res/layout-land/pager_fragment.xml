@@ -13,7 +13,8 @@
         android:layout_gravity="center_horizontal"
         app:tabSelectedTextColor="@color/orange12"
         app:tabTextColor="@android:color/white"
-        app:tabMode="scrollable"/>
+        app:tabMode="fixed"
+        app:tabGravity="fill"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
